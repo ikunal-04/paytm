@@ -11,9 +11,31 @@ import { useNavigate } from "react-router-dom";
 function Signup() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const response = await axios.post("http://localhost:3000/api/v1/user/signup", {
+                username,
+                firstName,
+                lastName,
+                password,
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            localStorage.setItem('token', response.data.token);
+            navigate('/dashboard')
+        } catch (error) {
+            console.log(error.response.data.error);
+        }
+    }
 
     return (
         <div className="bg-slate-300 h-screen flex justify-center">
@@ -21,7 +43,7 @@ function Signup() {
                 <div className="rounded-lg bg-white w-96 text-center p-2 h-max px-4">
                 <Heading label="Sign up"/>
                 <SubHeading sub_heading="Enter your information to create an account."/>
-                <form>
+                <form onSubmit={handleRegister}>
                     <Input label={"First Name"} placeholder="John" onChange={e => {
                         setFirstName(e.target.value);
                         }}/>
@@ -29,23 +51,16 @@ function Signup() {
                         setLastName(e.target.value);
                         }}/>
                     <Input label={"Email"} placeholder="john@example.com" onChange={e => {
-                        setEmail(e.target.value);
+                        setUsername(e.target.value);
                         }}/>
                     <Input label={"Password"} placeholder="12345" onChange={e => {
                         setPassword(e.target.value);
                         }}/>
                     <div className="mt-4">
-                        <Button onClick={async () => {
-                            const response = await axios.post("http://localhost:3000/api/v1/user/signup", {
-                                email,
-                                firstName,
-                                lastName,
-                                password
-                            });
-                            console.log(response.date.token);
-                            localStorage.setItem("token", response.data.token);
-                            navigate("/dashboard");
-                        }} children={"Sign up"}/>
+                        <Button children={"Sign up"} onClick={() => {
+                            console.log('nav to login');
+                            navigate('/dashboard')
+                        }}/>
                     </div>
                 </form>
                 <BottomWarning label={"Already have an account?" }buttonText={"Sign in"} to={"/signin"}/>

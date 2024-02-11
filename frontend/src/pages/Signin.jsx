@@ -8,9 +8,28 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Signin(){
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+
+    const handlelogin = async (e) => {
+        e.prevent.default();
+        try {
+            const response = await axios.post("http://localhost:3000/api/v1/user/signin", {
+                username,
+                password,
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            localStorage.setItem('token', response.data.token);
+            navigate('/dashboard')
+        } catch (error) {
+            console.log(error.response.data.error);
+        }
+    }
 
     return (
         <div className="bg-slate-300 flex justify-center h-screen">
@@ -18,22 +37,17 @@ function Signin(){
                 <div className="rounded-lg bg-white w-96 text-center p-2 h-max px-4">
                     <Heading label={"Sign in"}/>
                     <SubHeading sub_heading={"Enter your information to sign in."}/>
-                    <form>
+                    <form onSubmit={handlelogin}>
                         <Input label={"Email"} placeholder="john@example.com" onChange={e => {
-                            setEmail(e.target.value);
+                            setUsername(e.target.value);
                             }}/>
                         <Input label={"Password"} placeholder="123456" onChange={e => {
                             setPassword(e.target.value);
                         }}/>
                         <div className="mt-4">
-                            <Button children={"Sign in"} onClick={ async () => {
-                                const response = await axios.post("http://localhost:3000/api/v1/user/signin", {
-                                    email,
-                                    password
-                                });
-                                console.log(response.data.token)
-                                localStorage.setItem("token", response.data.token);
-                                navigate("/dashboard");
+                            <Button children={"Sign in"} onClick={() => {
+                                console.log("nav to dashboard");
+                                navigate("/dashboard")
                             }}/>
                         </div>
                     </form>
