@@ -15,26 +15,29 @@ function Signup() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    const handleRegister = async (e) => {
+    const handleChange = (e, setter) => {
+        const value = e.target.value;
+        console.log(value);
+        setter(value);
+    }
+
+    async function handleRegister(e) {
         e.preventDefault();
-        
-        try {
             const response = await axios.post("http://localhost:3000/api/v1/user/signup", {
-                username,
-                firstName,
-                lastName,
-                password,
+                username: username,
+                firstName: firstName,
+                lastName: lastName,
+                password: password,
             },
             {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            });
-            localStorage.setItem('token', response.data.token);
-            navigate('/dashboard')
-        } catch (error) {
-            console.log(error.response.data.error);
-        }
+            }).then((res) => {
+                localStorage.setItem('token', response.data.token);
+                console.log(res.data)
+                navigate('/dashboard')
+            })
     }
 
     return (
@@ -44,23 +47,12 @@ function Signup() {
                 <Heading label="Sign up"/>
                 <SubHeading sub_heading="Enter your information to create an account."/>
                 <form onSubmit={handleRegister}>
-                    <Input label={"First Name"} placeholder="John" onChange={e => {
-                        setFirstName(e.target.value);
-                        }}/>
-                    <Input label={"Last Name"} placeholder="Doe" onChange={e => {
-                        setLastName(e.target.value);
-                        }}/>
-                    <Input label={"Email"} placeholder="john@example.com" onChange={e => {
-                        setUsername(e.target.value);
-                        }}/>
-                    <Input label={"Password"} placeholder="12345" onChange={e => {
-                        setPassword(e.target.value);
-                        }}/>
+                    <Input label={"First Name"} placeholder="John" onChange={e => handleChange(e, setFirstName)}/>
+                    <Input label={"Last Name"} placeholder="Doe" onChange={e => handleChange(e, setLastName)}/>
+                    <Input label={"Email"} placeholder="john@example.com" onChange={e => handleChange(e, setUsername)}/>
+                    <Input label={"Password"} placeholder="12345" onChange={e => handleChange(e, setPassword)}/>
                     <div className="mt-4">
-                        <Button children={"Sign up"} onClick={() => {
-                            console.log('nav to login');
-                            navigate('/dashboard')
-                        }}/>
+                        <Button children="Sign up" typeb="submit"/>
                     </div>
                 </form>
                 <BottomWarning label={"Already have an account?" }buttonText={"Sign in"} to={"/signin"}/>

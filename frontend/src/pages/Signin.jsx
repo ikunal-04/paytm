@@ -12,23 +12,28 @@ function Signin(){
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    const handlelogin = async (e) => {
+    const handleChange = (e, setter) => {
+        const value = e.target.value;
+        console.log(value);
+        setter(value);
+    }
+
+    async function handlelogin (e) {
         e.prevent.default();
-        try {
+        console.log(username, password)
             const response = await axios.post("http://localhost:3000/api/v1/user/signin", {
-                username,
-                password,
+                username: username,
+                password: password,
             },
             {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            });
-            localStorage.setItem('token', response.data.token);
-            navigate('/dashboard')
-        } catch (error) {
-            console.log(error.response.data.error);
-        }
+            }).then((res) => {
+                console.log(res.data);
+                localStorage.setItem('token', res.data.token);
+                navigate('/dashboard')
+            })      
     }
 
     return (
@@ -38,17 +43,10 @@ function Signin(){
                     <Heading label={"Sign in"}/>
                     <SubHeading sub_heading={"Enter your information to sign in."}/>
                     <form onSubmit={handlelogin}>
-                        <Input label={"Email"} placeholder="john@example.com" onChange={e => {
-                            setUsername(e.target.value);
-                            }}/>
-                        <Input label={"Password"} placeholder="123456" onChange={e => {
-                            setPassword(e.target.value);
-                        }}/>
+                        <Input label={"Email"} placeholder="john@example.com" onChange={e => handleChange(e, setUsername)}/>
+                        <Input label={"Password"} placeholder="123456" onChange={e => handleChange(e, setPassword)}/>
                         <div className="mt-4">
-                            <Button children={"Sign in"} onClick={() => {
-                                console.log("nav to dashboard");
-                                navigate("/dashboard")
-                            }}/>
+                            <Button children={"Sign in"} typeb="submit"/>
                         </div>
                     </form>
                     <BottomWarning label={"Don't have an account?"} buttonText={"Sign up"} to={"/signup"}/>
